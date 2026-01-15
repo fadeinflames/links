@@ -1,0 +1,17 @@
+{
+  "name": "links-app",
+  "version": "1.0.0",
+  "description": "Simple link-in-bio application with click statistics",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["links", "linktree", "statistics"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2"
+  }
+}
