@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - Links</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background-color: transparent;
+            border: 1px solid #ffffff;
+            border-radius: 16px;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-group input {
+            background-color: transparent;
+            border: 1px solid #ffffff;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-button {
+            background-color: transparent;
+            border: 1px solid #ffffff;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .login-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #ffffff;
+            text-decoration: none;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .back-link a:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🔐 Вход в статистику</h1>
+        <form method="POST" action="/login" class="login-form">
+            <div class="form-group">
+                <label for="username">Логин</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-button">Войти</button>
+            <div id="errorMessage" style="display: none;" class="error-message">
+                Неверный логин или пароль
+            </div>
+        </form>
+        <div class="back-link">
+            <a href="/">← Назад к ссылкам</a>
+        </div>
+    </div>
+
+    <script>
+        // Show error message if present in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === 'invalid') {
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

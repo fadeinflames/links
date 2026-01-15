@@ -10,7 +10,7 @@
     <div class="container">
         <!-- Profile Section -->
         <div class="profile-card">
-            <img src="https://via.placeholder.com/150" alt="Maxim Gusev" class="profile-picture" id="profilePicture">
+            <img src="profile.jpg" alt="Maxim Gusev" class="profile-picture" id="profilePicture" onerror="this.onerror=null; this.src='profile.png';">
             <h1 class="profile-name">Maxim Gusev</h1>
             <p class="profile-title">Lead SRE Observability Team @ Dodo Engineering</p>
             
@@ -43,51 +43,83 @@
             </div>
         </div>
 
-        <!-- Mentoring Section -->
-        <div class="links-section">
-            <h2 class="section-title">MENTORING</h2>
-            <a href="https://getmentor.dev/your-profile" target="_blank" class="link-button" data-link-text="GetMentor">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 21l18 0M5 21L5 7l14 0v14M9 9l0 6M15 9l0 6M9 12h6"/>
-                </svg>
-                <span class="link-text">GetMentor</span>
-            </a>
-            <a href="https://calendly.com/your-calendar" target="_blank" class="link-button" data-link-text="Meet me">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="4" width="20" height="16" rx="2"/>
-                    <path d="M2 8h20M8 2v4M16 2v4"/>
-                </svg>
-                <span class="link-text">Meet me</span>
-            </a>
-        </div>
+        <!-- Links will be loaded dynamically from database -->
 
-        <!-- Notes Section -->
-        <div class="links-section">
-            <h2 class="section-title">NOTES</h2>
-            <a href="https://t.me/your_channel" target="_blank" class="link-button link-button-with-subtitle" data-link-text="A young Max's notebook">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21.5 2.5L2 12l7 2 8-8-5 8 8 2z"/>
-                </svg>
-                <div class="link-text-container">
-                    <span class="link-text">A young Max's notebook</span>
-                    <span class="link-subtitle">My telegram channel</span>
-                </div>
-            </a>
-            <a href="https://notes.yourdomain.com" target="_blank" class="link-button" data-link-text="My published Notes">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                </svg>
-                <span class="link-text">My published Notes</span>
-            </a>
-        </div>
-
-        <!-- Stats Link -->
-        <div class="stats-link">
-            <a href="/stats" class="stats-button">📊 Статистика</a>
-        </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Load links from API
+        async function loadLinks() {
+            try {
+                const response = await fetch('/api/links');
+                const data = await response.json();
+                
+                if (data.links && data.links.length > 0) {
+                    // Group links by category
+                    const linksByCategory = {};
+                    data.links.forEach(link => {
+                        const category = link.category || 'OTHER';
+                        if (!linksByCategory[category]) {
+                            linksByCategory[category] = [];
+                        }
+                        linksByCategory[category].push(link);
+                    });
+                    
+                    // Find container
+                    const container = document.querySelector('.container');
+                    
+                    // Remove existing link sections (keep profile card)
+                    const profileCard = document.querySelector('.profile-card');
+                    const existingSections = document.querySelectorAll('.links-section');
+                    existingSections.forEach(section => section.remove());
+                    
+                    // Add link sections
+                    Object.keys(linksByCategory).sort().forEach(category => {
+                        const section = document.createElement('div');
+                        section.className = 'links-section';
+                        section.innerHTML = `<h2 class="section-title">${category}</h2>`;
+                        
+                        linksByCategory[category].forEach(link => {
+                            const linkButton = document.createElement('a');
+                            linkButton.href = link.url;
+                            linkButton.target = '_blank';
+                            linkButton.className = link.subtitle ? 'link-button link-button-with-subtitle' : 'link-button';
+                            linkButton.setAttribute('data-link-text', link.text);
+                            
+                            // Icon SVG (simple link icon)
+                            const iconSvg = `<svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
+                            </svg>`;
+                            
+                            if (link.subtitle) {
+                                linkButton.innerHTML = `
+                                    ${iconSvg}
+                                    <div class="link-text-container">
+                                        <span class="link-text">${link.text}</span>
+                                        <span class="link-subtitle">${link.subtitle}</span>
+                                    </div>
+                                `;
+                            } else {
+                                linkButton.innerHTML = `
+                                    ${iconSvg}
+                                    <span class="link-text">${link.text}</span>
+                                `;
+                            }
+                            
+                            section.appendChild(linkButton);
+                        });
+                        
+                        container.insertBefore(section, container.lastElementChild);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading links:', error);
+            }
+        }
+        
+        // Load links when page loads
+        loadLinks();
+    </script>
 </body>
 </html>

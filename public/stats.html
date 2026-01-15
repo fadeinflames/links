@@ -10,7 +10,12 @@
     <div class="stats-container">
         <div class="stats-header">
             <h1>📊 Статистика кликов</h1>
-            <a href="/">← Назад к ссылкам</a>
+            <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
+                <a href="/">← Назад к ссылкам</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" style="background: transparent; border: 1px solid #ffffff; border-radius: 8px; padding: 8px 16px; color: #ffffff; cursor: pointer; font-size: 14px; font-family: inherit;">Выйти</button>
+                </form>
+            </div>
         </div>
 
         <!-- Total Clicks -->
@@ -83,6 +88,17 @@
         async function loadStats() {
             try {
                 const response = await fetch('/api/stats');
+                
+                // Check if unauthorized
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load stats');
+                }
+                
                 const data = await response.json();
 
                 // Total clicks
