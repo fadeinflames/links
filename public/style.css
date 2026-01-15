@@ -6,9 +6,9 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #1a1816 0%, #2a2520 50%, #1f1d1a 100%);
+    background: linear-gradient(135deg, #e8f5e9 0%, #f3e5f5 50%, #e1bee7 100%);
     background-attachment: fixed;
-    color: #ffffff;
+    color: #1a1a1a;
     min-height: 100vh;
     padding: 20px;
     line-height: 1.6;
@@ -22,14 +22,12 @@ body {
 
 /* Profile Card */
 .profile-card {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #ffffff;
     border-radius: 24px;
     padding: 50px 40px;
     text-align: center;
     margin-bottom: 30px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .profile-picture {
@@ -38,8 +36,11 @@ body {
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    border: 3px solid rgba(156, 39, 176, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    background: #f5f5f5;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 .profile-name {
@@ -47,49 +48,52 @@ body {
     font-weight: 600;
     margin-bottom: 12px;
     letter-spacing: -1px;
-    color: #ffffff;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: #1a1a1a;
 }
 
 .profile-title {
     font-size: 17px;
     font-weight: 400;
-    margin-bottom: 0;
-    opacity: 0.88;
+    margin-bottom: 25px;
     letter-spacing: 0.3px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #4a4a4a;
 }
 
 /* Social Links Container */
 .social-links-container {
-    margin-bottom: 40px;
+    margin-top: 25px;
     text-align: center;
 }
 
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 16px;
     flex-wrap: wrap;
 }
 
 .social-icon {
-    color: rgba(255, 255, 255, 0.9);
+    color: #1a1a1a;
     text-decoration: none;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    background: rgba(156, 39, 176, 0.1);
 }
 
 .social-icon:hover {
-    opacity: 1;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(156, 39, 176, 0.2);
     transform: scale(1.1);
+}
+
+.social-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #1a1a1a;
 }
 
 .social-icon svg {
@@ -109,17 +113,15 @@ body {
     letter-spacing: 1px;
     text-align: center;
     margin-bottom: 20px;
-    opacity: 0.85;
-    color: rgba(255, 255, 255, 0.9);
+    color: #4a4a4a;
 }
 
 .link-button {
     display: flex;
     align-items: center;
     gap: 15px;
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+    border: none;
     border-radius: 14px;
     padding: 16px 20px;
     margin-bottom: 12px;
@@ -127,20 +129,19 @@ body {
     color: #ffffff;
     transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
 }
 
 .link-button:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.25);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
 }
 
 .link-icon {
     flex-shrink: 0;
     width: 24px;
     height: 24px;
+    color: #ffffff;
 }
 
 .link-text-container {
@@ -153,12 +154,14 @@ body {
 .link-text {
     font-size: 16px;
     font-weight: 500;
+    color: #ffffff;
 }
 
 .link-subtitle {
     font-size: 12px;
-    opacity: 0.7;
+    opacity: 0.9;
     font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* Stats Link */
@@ -202,41 +205,41 @@ body {
 .stats-header h1 {
     font-size: 36px;
     margin-bottom: 10px;
+    color: #1a1a1a;
 }
 
 .stats-header a {
-    color: #ffffff;
+    color: #4a4a4a;
     text-decoration: none;
-    opacity: 0.7;
     font-size: 14px;
 }
 
 .stats-header a:hover {
-    opacity: 1;
+    color: #9c27b0;
 }
 
 .stats-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #ffffff;
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .stats-card h2 {
     font-size: 20px;
     margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     padding-bottom: 10px;
+    color: #1a1a1a;
 }
 
 .stat-item {
     display: flex;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    color: #1a1a1a;
 }
 
 .stat-item:last-child {
@@ -244,11 +247,12 @@ body {
 }
 
 .stat-label {
-    opacity: 0.8;
+    color: #4a4a4a;
 }
 
 .stat-value {
     font-weight: 600;
+    color: #1a1a1a;
 }
 
 .stats-table {
@@ -261,19 +265,20 @@ body {
 .stats-table td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    color: #1a1a1a;
 }
 
 .stats-table th {
     font-weight: 600;
-    opacity: 0.9;
+    color: #4a4a4a;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .stats-table tr:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(156, 39, 176, 0.05);
 }
 
 .stats-table .link-url {

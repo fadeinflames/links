@@ -67,6 +67,7 @@ db.exec(`
     category TEXT NOT NULL,
     subtitle TEXT,
     icon_svg TEXT,
+    color TEXT DEFAULT 'purple',
     display_order INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -207,7 +208,7 @@ app.get('/stats', requireAuth, (req, res) => {
 app.get('/api/links', (req, res) => {
   try {
     const links = db.prepare(`
-      SELECT id, text, url, category, subtitle, icon_svg, display_order
+      SELECT id, text, url, category, subtitle, icon_svg, color, display_order
       FROM links
       ORDER BY category, display_order, id
     `).all();
@@ -239,7 +240,7 @@ app.get('/api/social-links', (req, res) => {
 app.get('/api/admin/links', requireAuth, (req, res) => {
   try {
     const links = db.prepare(`
-      SELECT id, text, url, category, subtitle, icon_svg, display_order, created_at, updated_at
+      SELECT id, text, url, category, subtitle, icon_svg, color, display_order, created_at, updated_at
       FROM links
       ORDER BY category, display_order, id
     `).all();
@@ -271,7 +272,7 @@ app.get('/api/admin/categories', requireAuth, (req, res) => {
 // API: Create link (protected)
 app.post('/api/admin/links', requireAuth, (req, res) => {
   try {
-    const { text, url, category, subtitle, icon_svg, display_order } = req.body;
+    const { text, url, category, subtitle, icon_svg, color, display_order } = req.body;
     
     if (!text || !url || !category) {
       return res.status(400).json({ error: 'Text, URL, and category are required' });
@@ -289,11 +290,11 @@ app.post('/api/admin/links', requireAuth, (req, res) => {
     }
     
     const stmt = db.prepare(`
-      INSERT INTO links (text, url, category, subtitle, icon_svg, display_order)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO links (text, url, category, subtitle, icon_svg, color, display_order)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     
-    const result = stmt.run(text, url, category, subtitle || null, icon_svg || null, finalDisplayOrder);
+    const result = stmt.run(text, url, category, subtitle || null, icon_svg || null, color || 'purple', finalDisplayOrder);
     
     res.json({ success: true, id: result.lastInsertRowid });
   } catch (error) {
@@ -306,15 +307,15 @@ app.post('/api/admin/links', requireAuth, (req, res) => {
 app.put('/api/admin/links/:id', requireAuth, (req, res) => {
   try {
     const { id } = req.params;
-    const { text, url, category, subtitle, icon_svg, display_order } = req.body;
+    const { text, url, category, subtitle, icon_svg, color, display_order } = req.body;
     
     const stmt = db.prepare(`
       UPDATE links
-      SET text = ?, url = ?, category = ?, subtitle = ?, icon_svg = ?, display_order = ?, updated_at = CURRENT_TIMESTAMP
+      SET text = ?, url = ?, category = ?, subtitle = ?, icon_svg = ?, color = ?, display_order = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
     
-    stmt.run(text, url, category, subtitle || null, icon_svg || null, display_order || 0, id);
+    stmt.run(text, url, category, subtitle || null, icon_svg || null, color || 'purple', display_order || 0, id);
     
     res.json({ success: true });
   } catch (error) {

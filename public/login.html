@@ -10,17 +10,16 @@
             max-width: 400px;
             margin: 100px auto;
             padding: 40px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: #ffffff;
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .login-container h1 {
             text-align: center;
             margin-bottom: 30px;
             font-size: 28px;
+            color: #1a1a1a;
         }
 
         .login-form {
@@ -37,15 +36,15 @@
 
         .form-group label {
             font-size: 14px;
-            opacity: 0.9;
+            color: #1a1a1a;
         }
 
         .form-group input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: #f5f5f5;
+            border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             padding: 12px 16px;
-            color: #ffffff;
+            color: #1a1a1a;
             font-size: 16px;
             font-family: inherit;
             transition: all 0.3s ease;
@@ -53,18 +52,18 @@
 
         .form-group input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            border-color: #9c27b0;
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.1);
         }
 
         .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(0, 0, 0, 0.4);
         }
 
         .login-button {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+            border: none;
             border-radius: 10px;
             padding: 12px 24px;
             color: #ffffff;
@@ -73,14 +72,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: inherit;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
         }
 
         .login-button:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
         }
 
         .error-message {
@@ -101,14 +98,13 @@
         }
 
         .back-link a {
-            color: #ffffff;
+            color: #4a4a4a;
             text-decoration: none;
-            opacity: 0.7;
             font-size: 14px;
         }
 
         .back-link a:hover {
-            opacity: 1;
+            color: #9c27b0;
         }
     </style>
 </head>
