@@ -10,7 +10,7 @@
     <div class="container">
         <!-- Profile Section -->
         <div class="profile-card">
-            <img src="profile.jpg" alt="Maxim Gusev" class="profile-picture" id="profilePicture" onerror="this.onerror=null; this.src='profile.png';">
+            <img src="profile_fadeinflames.png" alt="Maxim Gusev" class="profile-picture" id="profilePicture" onerror="this.onerror=null; this.src='profile.png';">
             <h1 class="profile-name">Maxim Gusev</h1>
             <p class="profile-title">Lead SRE Observability Team @ Dodo Engineering</p>
             
@@ -74,7 +74,7 @@
                     const existingSections = document.querySelectorAll('.links-section');
                     existingSections.forEach(section => section.remove());
                     
-                    // Add link sections
+                    // Add link sections (sorted by category name)
                     Object.keys(linksByCategory).sort().forEach(category => {
                         const section = document.createElement('div');
                         section.className = 'links-section';
@@ -87,10 +87,21 @@
                             linkButton.className = link.subtitle ? 'link-button link-button-with-subtitle' : 'link-button';
                             linkButton.setAttribute('data-link-text', link.text);
                             
-                            // Icon SVG (simple link icon)
-                            const iconSvg = `<svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
-                            </svg>`;
+                            // Use custom icon if available, otherwise use default
+                            let iconSvg = link.icon_svg;
+                            if (!iconSvg) {
+                                // Default link icon
+                                iconSvg = `<svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
+                                </svg>`;
+                            } else {
+                                // Wrap custom SVG with link-icon class if not already present
+                                if (!iconSvg.includes('class=')) {
+                                    iconSvg = iconSvg.replace('<svg', '<svg class="link-icon"');
+                                } else if (!iconSvg.includes('link-icon')) {
+                                    iconSvg = iconSvg.replace('class="', 'class="link-icon ');
+                                }
+                            }
                             
                             if (link.subtitle) {
                                 linkButton.innerHTML = `

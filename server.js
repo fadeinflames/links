@@ -224,6 +224,23 @@ app.get('/api/admin/links', requireAuth, (req, res) => {
   }
 });
 
+// API: Get all categories (protected)
+app.get('/api/admin/categories', requireAuth, (req, res) => {
+  try {
+    const categories = db.prepare(`
+      SELECT DISTINCT category, COUNT(*) as link_count
+      FROM links
+      GROUP BY category
+      ORDER BY category
+    `).all();
+    
+    res.json({ categories });
+  } catch (error) {
+    console.error('Error getting categories:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // API: Create link (protected)
 app.post('/api/admin/links', requireAuth, (req, res) => {
   try {
@@ -233,12 +250,23 @@ app.post('/api/admin/links', requireAuth, (req, res) => {
       return res.status(400).json({ error: 'Text, URL, and category are required' });
     }
     
+    // If display_order not specified, set it to max + 1 for this category (adds to bottom)
+    let finalDisplayOrder = display_order;
+    if (finalDisplayOrder === undefined || finalDisplayOrder === null) {
+      const maxOrder = db.prepare(`
+        SELECT COALESCE(MAX(display_order), -1) as max_order
+        FROM links
+        WHERE category = ?
+      `).get(category);
+      finalDisplayOrder = (maxOrder.max_order || 0) + 1;
+    }
+    
     const stmt = db.prepare(`
       INSERT INTO links (text, url, category, subtitle, icon_svg, display_order)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
     
-    const result = stmt.run(text, url, category, subtitle || null, icon_svg || null, display_order || 0);
+    const result = stmt.run(text, url, category, subtitle || null, icon_svg || null, finalDisplayOrder);
     
     res.json({ success: true, id: result.lastInsertRowid });
   } catch (error) {
