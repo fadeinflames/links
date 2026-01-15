@@ -1,8 +1,12 @@
-// Track all link clicks
-document.addEventListener('DOMContentLoaded', () => {
+// Track all link clicks (including dynamically loaded)
+function setupClickTracking() {
     const allLinks = document.querySelectorAll('a[href]');
     
     allLinks.forEach(link => {
+        // Skip if already tracked
+        if (link.dataset.tracked === 'true') return;
+        link.dataset.tracked = 'true';
+        
         link.addEventListener('click', (e) => {
             const linkUrl = link.href;
             const linkText = link.getAttribute('data-link-text') || link.textContent.trim();
@@ -12,6 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Error tracking click:', err);
             });
         });
+    });
+}
+
+// Initial setup
+document.addEventListener('DOMContentLoaded', () => {
+    setupClickTracking();
+    
+    // Re-setup after dynamic content loads
+    const observer = new MutationObserver(() => {
+        setupClickTracking();
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
     });
 });
 

@@ -74,6 +74,17 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_category ON links(category);
   CREATE INDEX IF NOT EXISTS idx_display_order ON links(display_order);
+
+  CREATE TABLE IF NOT EXISTS social_links (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT NOT NULL,
+    icon_svg TEXT NOT NULL,
+    display_order INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_social_display_order ON social_links(display_order);
 `);
 
 // API: Track click
@@ -192,7 +203,7 @@ app.get('/stats', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'stats.html'));
 });
 
-// API: Get all links (public)
+// API: Get all links (public) - only category links, not social
 app.get('/api/links', (req, res) => {
   try {
     const links = db.prepare(`
@@ -204,6 +215,22 @@ app.get('/api/links', (req, res) => {
     res.json({ links });
   } catch (error) {
     console.error('Error getting links:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API: Get social links (public)
+app.get('/api/social-links', (req, res) => {
+  try {
+    const socialLinks = db.prepare(`
+      SELECT id, url, icon_svg, display_order
+      FROM social_links
+      ORDER BY display_order, id
+    `).all();
+    
+    res.json({ links: socialLinks });
+  } catch (error) {
+    console.error('Error getting social links:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -307,6 +334,87 @@ app.delete('/api/admin/links/:id', requireAuth, (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting link:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API: Get social links for admin (protected)
+app.get('/api/admin/social-links', requireAuth, (req, res) => {
+  try {
+    const links = db.prepare(`
+      SELECT id, url, icon_svg, display_order, created_at, updated_at
+      FROM social_links
+      ORDER BY display_order, id
+    `).all();
+    
+    res.json({ links });
+  } catch (error) {
+    console.error('Error getting social links:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API: Create social link (protected)
+app.post('/api/admin/social-links', requireAuth, (req, res) => {
+  try {
+    const { url, icon_svg, display_order } = req.body;
+    
+    if (!url || !icon_svg) {
+      return res.status(400).json({ error: 'URL and icon_svg are required' });
+    }
+    
+    let finalDisplayOrder = display_order;
+    if (finalDisplayOrder === undefined || finalDisplayOrder === null) {
+      const maxOrder = db.prepare('SELECT COALESCE(MAX(display_order), -1) as max_order FROM social_links').get();
+      finalDisplayOrder = (maxOrder.max_order || 0) + 1;
+    }
+    
+    const stmt = db.prepare(`
+      INSERT INTO social_links (url, icon_svg, display_order)
+      VALUES (?, ?, ?)
+    `);
+    
+    const result = stmt.run(url, icon_svg, finalDisplayOrder);
+    
+    res.json({ success: true, id: result.lastInsertRowid });
+  } catch (error) {
+    console.error('Error creating social link:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API: Update social link (protected)
+app.put('/api/admin/social-links/:id', requireAuth, (req, res) => {
+  try {
+    const { id } = req.params;
+    const { url, icon_svg, display_order } = req.body;
+    
+    const stmt = db.prepare(`
+      UPDATE social_links
+      SET url = ?, icon_svg = ?, display_order = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `);
+    
+    stmt.run(url, icon_svg, display_order || 0, id);
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating social link:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API: Delete social link (protected)
+app.delete('/api/admin/social-links/:id', requireAuth, (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const stmt = db.prepare('DELETE FROM social_links WHERE id = ?');
+    stmt.run(id);
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting social link:', error);
     res.status(500).json({ error: error.message });
   }
 });

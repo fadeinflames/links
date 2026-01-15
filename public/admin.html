@@ -249,9 +249,17 @@
 
         <div id="message" class="message hidden"></div>
 
+        <!-- Tabs -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+            <button id="tabCategoryLinks" class="btn" onclick="switchTab('category')" style="background: rgba(255, 255, 255, 0.1);">Тематические ссылки</button>
+            <button id="tabSocialLinks" class="btn" onclick="switchTab('social')">Социальные ссылки</button>
+        </div>
+
+        <!-- Category Links Section -->
+        <div id="categoryLinksSection">
         <!-- Add/Edit Link Form -->
         <div class="admin-card">
-            <h2 id="formTitle">Добавить ссылку</h2>
+            <h2 id="formTitle">Добавить тематическую ссылку</h2>
             <form id="linkForm">
                 <input type="hidden" id="linkId">
                 <div class="form-row">
@@ -295,20 +303,77 @@
 
         <!-- Links List -->
         <div class="admin-card">
-            <h2>Список ссылок</h2>
+            <h2>Список тематических ссылок</h2>
             <div id="linksList" class="links-list">
                 <div style="text-align: center; padding: 20px; opacity: 0.7;">Загрузка...</div>
             </div>
+        </div>
+        </div>
+
+        <!-- Social Links Section -->
+        <div id="socialLinksSection" style="display: none;">
+        <!-- Add/Edit Social Link Form -->
+        <div class="admin-card">
+            <h2 id="socialFormTitle">Добавить социальную ссылку</h2>
+            <form id="socialLinkForm">
+                <input type="hidden" id="socialLinkId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="socialLinkUrl">URL *</label>
+                        <input type="url" id="socialLinkUrl" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="socialLinkDisplayOrder">Порядок (опционально)</label>
+                        <input type="number" id="socialLinkDisplayOrder" placeholder="Автоматически" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="socialLinkIconSvg">SVG иконка *</label>
+                    <textarea id="socialLinkIconSvg" placeholder='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">...</svg>' required></textarea>
+                    <small style="opacity: 0.7; font-size: 12px; margin-top: 4px;">Вставьте SVG код иконки (обязательно)</small>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary" id="socialSubmitBtn">Добавить</button>
+                    <button type="button" class="btn" id="socialCancelBtn" style="display: none;" onclick="cancelSocialEdit()">Отмена</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Social Links List -->
+        <div class="admin-card">
+            <h2>Список социальных ссылок</h2>
+            <div id="socialLinksList" class="links-list">
+                <div style="text-align: center; padding: 20px; opacity: 0.7;">Загрузка...</div>
+            </div>
+        </div>
         </div>
     </div>
 
     <script>
         let editingId = null;
+        let socialEditingId = null;
         let categories = [];
+        let currentTab = 'category';
 
-        // Load categories and links on page load
+        // Load data on page load
         loadCategories();
         loadLinks();
+        loadSocialLinks();
+
+        function switchTab(tab) {
+            currentTab = tab;
+            if (tab === 'category') {
+                document.getElementById('categoryLinksSection').style.display = 'block';
+                document.getElementById('socialLinksSection').style.display = 'none';
+                document.getElementById('tabCategoryLinks').style.background = 'rgba(255, 255, 255, 0.1)';
+                document.getElementById('tabSocialLinks').style.background = 'transparent';
+            } else {
+                document.getElementById('categoryLinksSection').style.display = 'none';
+                document.getElementById('socialLinksSection').style.display = 'block';
+                document.getElementById('tabCategoryLinks').style.background = 'transparent';
+                document.getElementById('tabSocialLinks').style.background = 'rgba(255, 255, 255, 0.1)';
+            }
+        }
 
         // Handle form submission
         document.getElementById('linkForm').addEventListener('submit', async (e) => {
@@ -477,6 +542,132 @@
                 if (!response.ok) throw new Error('Ошибка удаления');
                 showMessage('Ссылка удалена', 'success');
                 loadLinks();
+            } catch (error) {
+                showMessage('Ошибка: ' + error.message, 'error');
+            }
+        }
+
+        // Social Links Management
+        document.getElementById('socialLinkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const socialLinkData = {
+                url: document.getElementById('socialLinkUrl').value,
+                icon_svg: document.getElementById('socialLinkIconSvg').value.trim(),
+                display_order: document.getElementById('socialLinkDisplayOrder').value.trim() ? parseInt(document.getElementById('socialLinkDisplayOrder').value) : undefined
+            };
+
+            try {
+                if (socialEditingId) {
+                    const response = await fetch(`/api/admin/social-links/${socialEditingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(socialLinkData)
+                    });
+
+                    if (!response.ok) throw new Error('Ошибка обновления');
+                    showMessage('Социальная ссылка обновлена', 'success');
+                } else {
+                    const response = await fetch('/api/admin/social-links', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(socialLinkData)
+                    });
+
+                    if (!response.ok) throw new Error('Ошибка создания');
+                    showMessage('Социальная ссылка добавлена', 'success');
+                }
+
+                resetSocialForm();
+                loadSocialLinks();
+            } catch (error) {
+                showMessage('Ошибка: ' + error.message, 'error');
+            }
+        });
+
+        async function loadSocialLinks() {
+            try {
+                const response = await fetch('/api/admin/social-links');
+                if (response.status === 401) {
+                    window.location.href = '/login?redirect=/admin';
+                    return;
+                }
+                const data = await response.json();
+                
+                const listContainer = document.getElementById('socialLinksList');
+                
+                if (data.links && data.links.length > 0) {
+                    listContainer.innerHTML = data.links.map(link => `
+                        <div class="link-item" style="margin-bottom: 8px;">
+                            <div class="link-item-info">
+                                <div class="link-item-title" style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="width: 24px; height: 24px; display: inline-block;">${link.icon_svg}</span>
+                                    <span>${link.url}</span>
+                                </div>
+                                <div class="link-item-category">Порядок: ${link.display_order}</div>
+                            </div>
+                            <div class="link-item-actions">
+                                <button class="btn btn-small" onclick="editSocialLink(${link.id})">Редактировать</button>
+                                <button class="btn btn-small btn-danger" onclick="deleteSocialLink(${link.id})">Удалить</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listContainer.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Нет социальных ссылок</div>';
+                }
+            } catch (error) {
+                console.error('Error loading social links:', error);
+                document.getElementById('socialLinksList').innerHTML = '<div style="text-align: center; padding: 20px; color: #ff6b6b;">Ошибка загрузки</div>';
+            }
+        }
+
+        async function editSocialLink(id) {
+            try {
+                const response = await fetch('/api/admin/social-links');
+                const data = await response.json();
+                const link = data.links.find(l => l.id === id);
+                
+                if (link) {
+                    socialEditingId = id;
+                    document.getElementById('socialLinkId').value = id;
+                    document.getElementById('socialLinkUrl').value = link.url;
+                    document.getElementById('socialLinkIconSvg').value = link.icon_svg;
+                    document.getElementById('socialLinkDisplayOrder').value = link.display_order || '';
+                    document.getElementById('socialFormTitle').textContent = 'Редактировать социальную ссылку';
+                    document.getElementById('socialSubmitBtn').textContent = 'Сохранить';
+                    document.getElementById('socialCancelBtn').style.display = 'inline-block';
+                    
+                    document.getElementById('socialLinkForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } catch (error) {
+                showMessage('Ошибка загрузки ссылки', 'error');
+            }
+        }
+
+        function cancelSocialEdit() {
+            resetSocialForm();
+        }
+
+        function resetSocialForm() {
+            socialEditingId = null;
+            document.getElementById('socialLinkForm').reset();
+            document.getElementById('socialLinkId').value = '';
+            document.getElementById('socialFormTitle').textContent = 'Добавить социальную ссылку';
+            document.getElementById('socialSubmitBtn').textContent = 'Добавить';
+            document.getElementById('socialCancelBtn').style.display = 'none';
+        }
+
+        async function deleteSocialLink(id) {
+            if (!confirm('Удалить эту социальную ссылку?')) return;
+            
+            try {
+                const response = await fetch(`/api/admin/social-links/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Ошибка удаления');
+                showMessage('Социальная ссылка удалена', 'success');
+                loadSocialLinks();
             } catch (error) {
                 showMessage('Ошибка: ' + error.message, 'error');
             }
